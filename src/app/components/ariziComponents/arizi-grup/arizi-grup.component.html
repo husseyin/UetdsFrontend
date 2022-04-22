@@ -1,0 +1,300 @@
+<!-- Toast and ConfirmDialog -->
+<p-toast [baseZIndex]="10000"></p-toast>
+<p-confirmDialog #ap [style]="{width: '40vw'}" [baseZIndex]="5000" [transitionOptions]="'250ms'" position="top">
+    <ng-template pTemplate="header">
+        <h5>Grup Durumu</h5>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <div class="p-fluid p-grid p-formgrid">
+            <span class="p-float-label">
+                <input type="text" id="apAciklama" pInputText [(ngModel)]="iptalAciklama">
+                <label for="apAciklama"> Açıklama <small class="p-error" *ngIf="!iptalAciklama">*zorunlu</small></label>
+            </span>
+        </div>
+
+        <button type="button" pButton icon="pi pi-times" class="p-button-text" label="İptal"
+            (click)="ap.reject()"></button>
+        <button type="button" pButton icon="pi pi-check" class="p-button-text" [disabled]="!iptalAciklama"
+            label="Kaydet" (click)="ap.accept()"></button>
+    </ng-template>
+</p-confirmDialog>
+
+<!-- AriziGrupDialog -->
+<p-dialog [(visible)]="ariziGrupDialog" [style]="{width: '40%', height:'80%'}" [transitionOptions]="'250ms'"
+    [draggable]="false" [resizable]="false" header="Yeni Grup Ekleme" [modal]="true" styleClass="p-fluid">
+
+    <ng-template pTemplate="content">
+
+        <div class="p-field p-col-12 p-md-2 mt-3">
+            <span class="p-float-label">
+                <input type="text" id="GrupAdi" pInputText [(ngModel)]="ariziGrup.GrupAdi">
+                <label for="GrupAdi"> Grup Adı <small class="p-error" *ngIf="!ariziGrup.GrupAdi">*zorunlu</small>
+                </label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <textarea id="GrupAciklama" rows="3" cols="30" pInputTextarea
+                    [(ngModel)]="ariziGrup.GrupAciklama"></textarea>
+                <label for="GrupAciklama"> Grup Açıklaması <small class="p-error"
+                        *ngIf="!ariziGrup.GrupAciklama">*zorunlu</small>
+                </label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <p-dropdown inputId="BaslangicIl" [autoDisplayFirst]="false" [options]="baslangicIller"
+                    optionLabel="IlAdi" [filter]="true" filterBy="IlAdi"
+                    (onChange)="ariziBaslangicIlce(selectBaslangicIl.IlKodu)" [(ngModel)]="selectBaslangicIl">
+                </p-dropdown>
+                <label for="BaslangicIl"> Baslangıç İli <small class="p-error"
+                        *ngIf="!selectBaslangicIl">*zorunlu</small></label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <p-dropdown inputId="BaslangicIlce" [options]="baslangicIlceler" optionLabel="IlceAdi" [filter]="true"
+                    filterBy="IlceAdi" [autoDisplayFirst]="false" [disabled]="!selectBaslangicIl"
+                    [(ngModel)]="selectBaslangicIlce"></p-dropdown>
+                <label for="BaslangicIlce"> Baslangıç İlçesi <small class="p-error"
+                        *ngIf="!selectBaslangicIlce">*zorunlu</small></label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <p-dropdown inputId="BitisIl" [autoDisplayFirst]="false" [options]="bitisIller" optionLabel="IlAdi"
+                    [filter]="true" filterBy="IlAdi" (onChange)="ariziBitisIlce(selectBitisIl.IlKodu)"
+                    [(ngModel)]="selectBitisIl"></p-dropdown>
+                <label for="BitisIl"> Bitiş İli <small class="p-error" *ngIf="!selectBitisIl">*zorunlu</small></label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <p-dropdown inputId="BitisIlce" [options]="bitisIlceler" optionLabel="IlceAdi" [filter]="true"
+                    filterBy="IlceAdi" [autoDisplayFirst]="false" [disabled]="!selectBitisIl"
+                    [(ngModel)]="selectBitisIlce"></p-dropdown>
+                <label for="BitisIlce"> Bitiş İlçesi <small class="p-error"
+                        *ngIf="!selectBitisIlce">*zorunlu</small></label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <input type="number" id="GrupUcret" pInputText [(ngModel)]="ariziGrup.GrupUcret">
+                <label for="GrupUcret"> Grup Ücreti <small class="p-error" *ngIf="!ariziGrup.GrupUcret">*zorunlu</small>
+                </label>
+            </span>
+        </div>
+
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="İptal" icon="pi pi-times" class="p-button-text"
+            (click)="dialogGrupCancel()"></button>
+        <button pButton pRipple label="Kaydet" icon="pi pi-check" class="p-button-text"
+            (click)="dialogGrupSave(ariziGrup)"></button>
+    </ng-template>
+</p-dialog>
+
+<!-- AriziGruplar -->
+<div class="card">
+    <div class="card-header">
+        <b>AriziGrup Yönetimi</b>
+        <div style="float: right;">
+            <button type="button" class="btn btn-link btn-sm" [routerLink]="['/ariziPersoneller']"
+                [queryParams]="{ariziSeferNo : ariziSeferNo}">personeller</button>
+            <button type="button" class="btn btn-link btn-sm" [routerLink]="['/ariziSeferler']">seferler</button>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <p-table #dtAriziGrupDetay [value]="ariziGrupDetaylar" styleClass="p-datatable-sm" [scrollable]="true"
+            scrollHeight="400px" dataKey="Id" [selectionMode]="selectionMode" [(selection)]="selectedAriziGrupDetay"
+            editMode="row" responsiveLayout="scroll" [paginator]="true" [rows]="rows" [showCurrentPageReport]="true"
+            [(first)]="first" [rowsPerPageOptions]="[5,10,15]" [loading]="loading">
+
+            <ng-template pTemplate="caption">
+                <div style="text-align: left;">
+                    <button pButton pRipple label="Grup Ekle" icon="pi pi-plus" class="p-button-success p-button-sm"
+                        [disabled]="selectedAriziGrupDetay" (click)="dialogGrupAdd()"></button>
+                    <button pButton pRipple label="Yolcu Ekle" icon="pi pi-users" class="p-button-info p-button-sm"
+                        style="margin-left: 1%;" [disabled]="!selectedAriziGrupDetay" [routerLink]="['/ariziYolcular']"
+                        [queryParams]="{ariziSeferNo : selectedAriziGrupDetay ? selectedAriziGrupDetay.UetdsSeferReferansNo : -1, ariziGrupNo : selectedAriziGrupDetay ? selectedAriziGrupDetay.UetdsGrupRefNo : -1}"></button>
+                    <button pButton pRipple label="İptal Et" icon="pi pi-info-circle" class="p-button-help p-button-sm"
+                        style="margin-left: 1%;" [disabled]="!selectedAriziGrupDetay"
+                        (click)="confirmGrup(selectedAriziGrupDetay)"></button>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="min-width:120px">
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="UetdsSeferReferansNo"> Uetds_Sefer_Numarası <p-sortIcon
+                            field="UetdsSeferReferansNo">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="UetdsGrupRefNo"> Uetds_Grup_Numarası <p-sortIcon
+                            field="UetdsGrupRefNo">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="GrupAdi"> Grup_Adı <p-sortIcon field="GrupAdi">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="GrupAciklama"> Grup_Açıklaması <p-sortIcon
+                            field="GrupAciklama">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="GrupUcret"> Grup_Ücreti <p-sortIcon field="GrupUcret">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="BaslangicIl"> Başlangıç_İli <p-sortIcon
+                            field="BaslangicIl">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="BaslangicIlce"> Başlangıç_İlçesi <p-sortIcon
+                            field="BaslangicIlce">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="BitisIl"> Bitiş_İli <p-sortIcon field="BitisIl">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="BitisIlce"> Bitiş_İlçesi <p-sortIcon field="BitisIlce">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="AktifIptal"> Aktif_İptal <p-sortIcon
+                            field="AktifIptal">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="IptalAciklama"> İptal_Açıklaması <p-sortIcon
+                            field="IptalAciklama">
+                        </p-sortIcon>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-ariziGrupDetay let-rowIndex="rowIndex" let-editing="editing">
+                <tr [pSelectableRow]="ariziGrupDetay" [pSelectableRowIndex]="rowIndex" [pEditableRow]="ariziGrupDetay">
+                    <td style="text-align:left; max-width:120px">
+                        <span style="margin-right: 20px;"> {{rowIndex + 1}}~ </span>
+
+                        <button *ngIf="!editing && selectedAriziGrupDetay == ariziGrupDetay" pButton pRipple
+                            type="button" pInitEditableRow icon="pi pi-pencil" class="p-button-rounded p-button-text"
+                            (click)="editGrup(ariziGrupDetay)"></button>
+                        <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check"
+                            class="p-button-rounded p-button-text p-button-success p-mr-2"
+                            (click)="editGrupSave(selectedAriziGrupDetay)"></button>
+                        <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times"
+                            class="p-button-rounded p-button-text p-button-danger"
+                            (click)="editGrupCancel(rowIndex)"></button>
+                    </td>
+                    <td>{{ariziGrupDetay.UetdsSeferReferansNo}}</td>
+                    <td>{{ariziGrupDetay.UetdsGrupRefNo}}</td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText type="text" [(ngModel)]="ariziGrupDetay.GrupAdi">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{ariziGrupDetay.GrupAdi}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText type="text" [(ngModel)]="ariziGrupDetay.GrupAciklama">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{ariziGrupDetay.GrupAciklama}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText type="number" [style]="{'width': '7rem'}"
+                                    [(ngModel)]="ariziGrupDetay.GrupUcret">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{ariziGrupDetay.GrupUcret}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <p-dropdown [options]="baslangicIller" optionLabel="IlAdi" [filter]="true"
+                                    filterBy="IlAdi" [placeholder]="ariziGrupDetay.BaslangicIlAdi"
+                                    (onChange)="ariziBaslangicIlce(selectBaslangicIl.IlKodu)"
+                                    [(ngModel)]="selectBaslangicIl">
+                                </p-dropdown>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{ariziGrupDetay.BaslangicIlAdi}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <p-dropdown [options]="baslangicIlceler" optionLabel="IlceAdi" [filter]="true"
+                                    filterBy="IlceAdi" [placeholder]="ariziGrupDetay.BaslangicIlceAdi"
+                                    [disabled]="!selectBaslangicIl" [(ngModel)]="selectBaslangicIlce">
+                                </p-dropdown>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{ariziGrupDetay.BaslangicIlceAdi}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <p-dropdown [options]="bitisIller" optionLabel="IlAdi" [filter]="true" filterBy="IlAdi"
+                                    (onChange)="ariziBitisIlce(selectBitisIl.IlKodu)"
+                                    [placeholder]="ariziGrupDetay.BitisIlAdi" [(ngModel)]="selectBitisIl">
+                                </p-dropdown>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{ariziGrupDetay.BitisIlAdi}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <p-dropdown [options]="bitisIlceler" optionLabel="IlceAdi" [filter]="true"
+                                    filterBy="IlceAdi" [placeholder]="ariziGrupDetay.BitisIlceAdi"
+                                    [disabled]="!selectBitisIl" [(ngModel)]="selectBitisIlce">
+                                </p-dropdown>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{ariziGrupDetay.BitisIlceAdi}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        {{ariziGrupDetay.AktifIptal}}
+                    </td>
+                    <td>
+                        {{ariziGrupDetay.IptalAciklama}}
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="summary">
+                <div class="p-d-flex p-ai-center p-jc-between">
+                    Toplam: {{ariziGrupDetaylar ? ariziGrupDetaylar.length : 0 }}
+                </div>
+            </ng-template>
+        </p-table>
+    </div>
+    <div style="text-align: right; font-size: small" class="card-footer text-muted">
+        Copyright © 2021 UetdsArizi. All rights reserved.
+    </div>
+</div>

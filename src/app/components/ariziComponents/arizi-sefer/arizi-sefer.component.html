@@ -1,0 +1,308 @@
+<!-- Toast and ConfirmDialog -->
+<p-toast [baseZIndex]="10000"></p-toast>
+<p-confirmDialog #ap [style]="{width: '40vw'}" [baseZIndex]="5000" [transitionOptions]="'250ms'" position="top">
+    <ng-template pTemplate="header">
+        <h5>Sefer Durumu</h5>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <div class="p-fluid p-grid p-formgrid">
+            <span class="p-float-label">
+                <input type="text" id="apAciklama" pInputText [(ngModel)]="aktifPasifAciklama">
+                <label for="apAciklama"> Açıklama <small class="p-error"
+                        *ngIf="!aktifPasifAciklama">*zorunlu</small></label>
+            </span>
+        </div>
+
+        <button type="button" pButton icon="pi pi-times" class="p-button-text" label="İptal"
+            (click)="ap.reject()"></button>
+        <button type="button" pButton icon="pi pi-check" class="p-button-text" [disabled]="!aktifPasifAciklama"
+            label="Kaydet" (click)="ap.accept()"></button>
+    </ng-template>
+</p-confirmDialog>
+
+<!-- AriziSeferDialog -->
+<p-dialog [(visible)]="ariziSeferDialog" [style]="{width: '40%', height:'80%'}" [transitionOptions]="'250ms'"
+    [draggable]="false" [resizable]="false" header="Yeni Sefer Ekleme" [modal]="true" styleClass="p-fluid">
+
+    <ng-template pTemplate="content">
+
+        <div class="p-field p-col-12 p-md-2 mt-3">
+            <span class="p-float-label">
+                <input type="text" id="FirmaSeferNo" pInputText [(ngModel)]="ariziSefer.FirmaSeferNo">
+                <label for="FirmaSeferNo"> Firma Sefer Numarası </label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <p-dropdown inputId="AracPlaka" [autoDisplayFirst]="false" [options]="plakalar" optionLabel="Plaka"
+                    [filter]="true" filterBy="Plaka" [(ngModel)]="selectPalaka">
+                </p-dropdown>
+                <label for="AracPlaka"> Araç Plakası <small class="p-error"
+                        *ngIf="!selectPalaka">*zorunlu</small></label>
+            </span>
+        </div>
+
+        <div class="p-fluid p-grid p-formgrid">
+            <div style="display: inline-flex; width: 40%;" class="p-field p-col-12 p-md-2 mt-2">
+                <span class="field">
+                    <label for="HareketTarihi"> Sefer Hareket Tarihi <small class="p-error"
+                            *ngIf="!ariziSefer.HareketTarihi">*zorunlu</small> </label>
+                    <input pInputText type="date" id="HareketTarihi" [(ngModel)]="ariziSefer.HareketTarihi">
+                </span>
+            </div>
+
+            <div style="display: inline-flex; float: right; width: 38%;" class="p-field p-col-12 p-md-2 mt-2">
+                <span class="field">
+                    <label for="HareketSaati"> Sefer Hareket Saati <small class="p-error"
+                            *ngIf="!ariziSefer.HareketSaati">*zorunlu</small> </label>
+                    <input pInputText type="time" id="HareketSaati" [(ngModel)]="ariziSefer.HareketSaati">
+                </span>
+            </div>
+        </div>
+
+        <div class="p-fluid p-grid p-formgrid">
+            <div style="display: inline-flex; width: 40%;" class="p-field p-col-12 p-md-2 mt-2">
+                <span class="field">
+                    <label for="SeferBitisTarihi"> Sefer Bitiş Tarihi <small class="p-error"
+                            *ngIf="!ariziSefer.SeferBitisTarihi">*zorunlu</small> </label>
+                    <input pInputText type="date" id="SeferBitisTarihi" [(ngModel)]="ariziSefer.SeferBitisTarihi">
+                </span>
+            </div>
+
+            <div style="display: inline-flex; float: right; width: 38%;" class="p-field p-col-12 p-md-2 mt-2">
+                <span class="field">
+                    <label for="SeferBitisSaati"> Sefer Bitiş Saati <small class="p-error"
+                            *ngIf="!ariziSefer.SeferBitisSaati">*zorunlu</small> </label>
+                    <input pInputText type="time" id="SeferBitisSaati" [(ngModel)]="ariziSefer.SeferBitisSaati">
+                </span>
+            </div>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <textarea id="SeferAciklama" rows="3" cols="30" pInputTextarea
+                    [(ngModel)]="ariziSefer.SeferAciklama"></textarea>
+                <label for="SeferAciklama"> Sefer Açıklaması </label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <p-inputMask mask="999-999-9999" [(ngModel)]="ariziSefer.AracTelefonu"></p-inputMask>
+                <label for="AracTelefonu"> Araç Telefonu </label>
+            </span>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="İptal" icon="pi pi-times" class="p-button-text"
+            (click)="dialogSeferCancel()"></button>
+        <button pButton pRipple label="Kaydet" icon="pi pi-check" class="p-button-text"
+            (click)="dialogSeferSave(ariziSefer)"></button>
+    </ng-template>
+</p-dialog>
+
+<!-- AriziSeferler -->
+<div class="card">
+    <div style="font-weight: bold" class="card-header">AriziSefer Yönetimi</div>
+
+    <div class="card-body">
+        <p-table #dtAriziSefer [value]="ariziSeferler" styleClass="p-datatable-sm" [scrollable]="true"
+            scrollHeight="400px" dataKey="Id" [selectionMode]="selectionMode" [(selection)]="selectedAriziSefer"
+            editMode="row" responsiveLayout="scroll" [paginator]="true" [rows]="rows" [showCurrentPageReport]="true"
+            [(first)]="first" [rowsPerPageOptions]="[5,10,15]" [loading]="loading">
+
+            <ng-template pTemplate="caption">
+                <div style="text-align: left;">
+                    <button pButton pRipple label="Sefer Ekle" icon="pi pi-plus" class="p-button-success p-button-sm"
+                        [disabled]="selectedAriziSefer" (click)="dialogSeferAdd()"></button>
+                    <button pButton pRipple label="Grup Ekle" icon="pi pi-users" class="p-button-info p-button-sm"
+                        style="margin-left: 1%;" [disabled]="!selectedAriziSefer" [routerLink]="['/ariziGruplar']"
+                        [queryParams]="{ariziSeferNo : selectedAriziSefer ? selectedAriziSefer.UetdsSeferReferansNo : -1}"></button>
+                    <button pButton pRipple label="Personel Ekle" icon="pi pi-user-plus"
+                        class="p-button-secondary p-button-sm" style="margin-left: 1%;" [disabled]="!selectedAriziSefer"
+                        [routerLink]="['/ariziPersoneller']"
+                        [queryParams]="{ariziSeferNo : selectedAriziSefer ? selectedAriziSefer.UetdsSeferReferansNo : -1}"></button>
+                    <button pButton pRipple label="Aktif_Pasif" icon="pi pi-info-circle"
+                        class="p-button-help p-button-sm" style="margin-left: 1%;" [disabled]="!selectedAriziSefer"
+                        (click)="confirmSefer(selectedAriziSefer)"></button>
+                    <button style="float: right;" type="button" *ngIf="selectedAriziSefer" pButton pRipple
+                        label="Sefer Detay" icon="pi pi-file-pdf" class="p-button-warning p-button-sm p-mr-2"
+                        pTooltip="PDF" (click)="ariziSeferPDF(selectedAriziSefer.UetdsSeferReferansNo)"
+                        tooltipPosition="bottom"></button>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="min-width:120px">
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="UetdsSeferReferansNo"> Uetds_Sefer_Numarası <p-sortIcon
+                            field="UetdsSeferReferansNo">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="FirmaSeferNo"> Firma_Sefer_Numarası<p-sortIcon
+                            field="FirmaSeferNo">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="AracPlaka"> Araç_Plakası <p-sortIcon field="AracPlaka">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="HareketTarihi"> Sefer_Hareket_Tarihi <p-sortIcon
+                            field="HareketTarihi">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="HareketSaati"> Sefer_Hareket_Saati <p-sortIcon
+                            field="HareketSaati">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="SeferBitisTarihi"> Sefer_Bitiş_Tarihi <p-sortIcon
+                            field="SeferBitisTarihi">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="SeferBitisSaati"> Sefer_Bitiş_Saati <p-sortIcon
+                            field="SeferBitisSaati">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="SeferAciklama"> Sefer_Açıklaması <p-sortIcon
+                            field="SeferAciklama">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="AracTelefonu"> Araç_Telefonu <p-sortIcon
+                            field="AracTelefonu">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="AktifPasif"> Aktif_Pasif <p-sortIcon
+                            field="AktifPasif">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="AktifPasifAciklama"> Aktif_Pasif_Açıklaması <p-sortIcon
+                            field="AktifPasifAciklama">
+                        </p-sortIcon>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-ariziSefer let-rowIndex="rowIndex" let-editing="editing">
+                <tr [pSelectableRow]="ariziSefer" [pSelectableRowIndex]="rowIndex" [pEditableRow]="ariziSefer">
+                    <td style="text-align:left; max-width:120px">
+                        <span style="margin-right: 20px;"> {{rowIndex + 1}}~ </span>
+
+                        <button *ngIf="!editing && selectedAriziSefer == ariziSefer" pButton pRipple type="button"
+                            pInitEditableRow icon="pi pi-pencil" class="p-button-rounded p-button-text"
+                            (click)="editSefer(selectedAriziSefer)"></button>
+                        <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check"
+                            class="p-button-rounded p-button-text p-button-success p-mr-2"
+                            (click)="editSeferSave(selectedAriziSefer)"></button>
+                        <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times"
+                            class="p-button-rounded p-button-text p-button-danger"
+                            (click)="editSeferCancel(rowIndex)"></button>
+                    </td>
+                    <td>{{ariziSefer.UetdsSeferReferansNo}}</td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input type="text" pInputText [(ngModel)]="ariziSefer.FirmaSeferNo">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{ariziSefer.FirmaSeferNo}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <p-dropdown inputId="AracPlaka" [autoDisplayFirst]="false" [options]="plakalar"
+                                    optionLabel="Plaka" [filter]="true" filterBy="Plaka"
+                                    [placeholder]="ariziSefer.AracPlaka" [(ngModel)]="selectPalaka">
+                                </p-dropdown>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{ariziSefer.AracPlaka}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input type="date" id="HareketTarihi" [style]="{'width': '9rem'}" pInputText
+                                    [(ngModel)]="ariziSefer.HareketTarihi">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{ariziSefer.HareketTarihi | date: 'dd.MM.yyyy'}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input type="time" id="HareketSaati" pInputText [(ngModel)]="ariziSefer.HareketSaati">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{ariziSefer.HareketSaati}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input type="date" id="SeferBitisTarihi" [style]="{'width': '9rem'}" pInputText
+                                    [(ngModel)]="ariziSefer.SeferBitisTarihi">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{ariziSefer.SeferBitisTarihi | date: 'dd.MM.yyyy'}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input type="time" id="SeferBitisSaati" pInputText
+                                    [(ngModel)]="ariziSefer.SeferBitisSaati">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{ariziSefer.SeferBitisSaati}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input type="text" pInputText [(ngModel)]="ariziSefer.SeferAciklama">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{ariziSefer.SeferAciklama}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <p-inputMask mask="999-999-9999" [style]="{'width': '8rem'}"
+                                    [(ngModel)]="ariziSefer.AracTelefonu"></p-inputMask>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{ariziSefer.AracTelefonu}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        {{ariziSefer.AktifPasif}}
+                    </td>
+                    <td>
+                        {{ariziSefer.AktifPasifAciklama}}
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="summary">
+                <div class="p-d-flex p-ai-center p-jc-between">
+                    Toplam: {{ariziSeferler ? ariziSeferler.length : 0 }}
+                </div>
+            </ng-template>
+        </p-table>
+    </div>
+    <div style="text-align: right; font-size: small" class="card-footer text-muted">
+        Copyright © 2021 UetdsArizi. All rights reserved.
+    </div>
+</div>

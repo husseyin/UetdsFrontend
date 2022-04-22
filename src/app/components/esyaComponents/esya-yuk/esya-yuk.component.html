@@ -1,0 +1,622 @@
+<!-- Toast and ConfirmDialog -->
+<p-toast [baseZIndex]="10000"></p-toast>
+<p-confirmDialog #ap [style]="{width: '40vw'}" [baseZIndex]="5000" [transitionOptions]="'250ms'" position="top">
+    <ng-template pTemplate="header">
+        <h5>Yuk Durumu</h5>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <div class="p-fluid p-grid p-formgrid">
+            <span class="p-float-label" style="text-align: left;" *ngIf="aktifIptalMode">
+                <p-dropdown inputId="IptalTur" [autoDisplayFirst]="false" [options]="iptalTurleri"
+                    optionLabel="aciklamaField" [filter]="true" filterBy="aciklamaField" [(ngModel)]="selectIptalTur">
+                </p-dropdown>
+                <label for="IptalTur"> İptal Tür <small class="p-error" *ngIf="!selectIptalTur">*zorunlu</small></label>
+            </span>
+        </div>
+        <button type="button" pButton icon="pi pi-times" class="p-button-text" label="İptal"
+            (click)="ap.reject()"></button>
+        <button type="button" pButton icon="pi pi-check" class="p-button-text" label="Kaydet"
+            (click)="ap.accept()"></button>
+    </ng-template>
+</p-confirmDialog>
+
+<!-- EsyaYukDialog -->
+<p-dialog [(visible)]="esyaYukDialog" [style]="{width: '40%', height:'80%'}" [transitionOptions]="'250ms'"
+    [draggable]="false" [resizable]="false" header="Yeni Yuk Ekleme" [modal]="true" styleClass="p-fluid">
+
+    <ng-template pTemplate="content">
+
+        <div class="p-field p-col-12 p-md-2 mt-3">
+            <span class="p-float-label">
+                <input type="text" id="FirmaYukNo" pInputText [(ngModel)]="esyaYuk.FirmaYukNo">
+                <label for="FirmaYukNo"> Firma Yük Numarası </label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <input type="number" id="GonderenVergiNo" pInputText [(ngModel)]="esyaYuk.GonderenVergiNo">
+                <label for="GonderenVergiNo"> Gönderen Vergi No <small class="p-error"
+                        *ngIf="!esyaYuk.GonderenVergiNo">*zorunlu</small></label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <input type="text" id="GonderenUnvan" pInputText [(ngModel)]="esyaYuk.GonderenUnvan">
+                <label for="GonderenUnvan"> Gönderen Ünvanı <small class="p-error"
+                        *ngIf="!esyaYuk.GonderenUnvan">*zorunlu</small></label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <input type="number" id="AliciVergiNo" pInputText [(ngModel)]="esyaYuk.AliciVergiNo">
+                <label for="AliciVergiNo"> Alıcı Vergi No <small class="p-error"
+                        *ngIf="!esyaYuk.AliciVergiNo">*zorunlu</small></label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <input type="text" id="AliciUnvan" pInputText [(ngModel)]="esyaYuk.AliciUnvan">
+                <label for="AliciUnvan"> Alıcı Ünvanı <small class="p-error"
+                        *ngIf="!esyaYuk.AliciUnvan">*zorunlu</small></label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <p-dropdown inputId="TasimaTuruKodu" [autoDisplayFirst]="false" [options]="tasimaTurleri"
+                    optionLabel="Aciklama" [filter]="true" filterBy="Aciklama"
+                    (onChange)="esyaYukTurleri(); esyaYukBirimleri(); esyaTehlikeliTasimaSekilleri(); esyaUnDetay()"
+                    [(ngModel)]="selectTasimaTur">
+                </p-dropdown>
+                <label for="TasimaTuruKodu"> Taşıma Türü <small class="p-error"
+                        *ngIf="!selectTasimaTur">*zorunlu</small></label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <p-dropdown inputId="TehlikeliMaddeTasimaKodu" [autoDisplayFirst]="false" [options]="tehlikeSekilleri"
+                    optionLabel="Aciklama" [filter]="true" filterBy="Aciklama" [disabled]="!tehlikeSekilleri"
+                    [(ngModel)]="selectTehlikeSekil">
+                </p-dropdown>
+                <label for="TehlikeliMaddeTasimaKodu"> Tehlikeli Taşıma Şekli <small class="p-error"
+                        *ngIf="!selectTehlikeSekil && tehlikeSekilleri">*zorunlu</small></label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <p-dropdown inputId="UnId" [autoDisplayFirst]="false" [options]="unDetaylar" optionLabel="UnDetail"
+                    [filter]="true" filterBy="UnDetail" [disabled]="!unDetaylar" [(ngModel)]="selectUnDetay">
+                </p-dropdown>
+                <label for="UnId"> Un Numarası <small class="p-error"
+                        *ngIf="!selectUnDetay && unDetaylar">*zorunlu</small></label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <p-dropdown inputId="YukCinsId" [autoDisplayFirst]="false" [options]="yukTurleri" optionLabel="TipAdi"
+                    [filter]="true" filterBy="TipAdi" [disabled]="!selectTasimaTur" [(ngModel)]="selectYukTur">
+                </p-dropdown>
+                <label for="YukCinsId"> Yük Cinsi <small class="p-error" *ngIf="!selectYukTur">*zorunlu</small></label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <p-dropdown inputId="YukMiktariBirimi" [autoDisplayFirst]="false" [options]="yukBirimleri"
+                    optionLabel="Aciklama" [filter]="true" filterBy="Aciklama" [disabled]="!selectTasimaTur"
+                    [(ngModel)]="selectYukBirim">
+                </p-dropdown>
+                <label for="YukMiktariBirimi"> Yük Miktar Birimi <small class="p-error"
+                        *ngIf="!selectYukBirim">*zorunlu</small></label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <input type="number" id="YukMiktari" pInputText [(ngModel)]="esyaYuk.YukMiktari">
+                <label for="YukMiktari"> Yük Miktarı <small class="p-error"
+                        *ngIf="!esyaYuk.YukMiktari">*zorunlu</small></label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <p-dropdown inputId="YuklemeIlMernisKodu" [autoDisplayFirst]="false" [options]="yuklemeIller"
+                    optionLabel="IlAdi" [filter]="true" filterBy="IlAdi"
+                    (onChange)="esyaYuklemeIlce(selectYuklemeIl.IlKodu)" [(ngModel)]="selectYuklemeIl">
+                </p-dropdown>
+                <label for="YuklemeIlMernisKodu"> Yükleme İli <small class="p-error"
+                        *ngIf="!selectYuklemeIl">*zorunlu</small></label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <p-dropdown inputId="YuklemeIlceMernisKodu" [options]="yuklemeIlceler" optionLabel="IlceAdi"
+                    [filter]="true" filterBy="IlceAdi" [autoDisplayFirst]="false" [disabled]="!selectYuklemeIl"
+                    [(ngModel)]="selectYuklemeIlce"></p-dropdown>
+                <label for="YuklemeIlceMernisKodu"> Yükleme İlçesi <small class="p-error"
+                        *ngIf="!selectYuklemeIlce">*zorunlu</small></label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <p-dropdown inputId="BosaltmaIlMernisKodu" [autoDisplayFirst]="false" [options]="bosaltmaIller"
+                    optionLabel="IlAdi" [filter]="true" filterBy="IlAdi"
+                    (onChange)="esyaBosaltmaIlce(selectBosaltmaIl.IlKodu)" [(ngModel)]="selectBosaltmaIl"></p-dropdown>
+                <label for="BosaltmaIlMernisKodu"> Boşaltma İli <small class="p-error"
+                        *ngIf="!selectBosaltmaIl">*zorunlu</small></label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <p-dropdown inputId="BosaltmaIlceMernisKodu" [options]="bosaltmaIlceler" optionLabel="IlceAdi"
+                    [filter]="true" filterBy="IlceAdi" [autoDisplayFirst]="false" [disabled]="!selectBosaltmaIl"
+                    [(ngModel)]="selectBosaltmaIlce"></p-dropdown>
+                <label for="BosaltmaIlceMernisKodu"> Boşaltma İlçesi <small class="p-error"
+                        *ngIf="!selectBosaltmaIlce">*zorunlu</small></label>
+            </span>
+        </div>
+
+        <div class="p-fluid p-grid p-formgrid">
+            <div style="display: inline-flex; width: 45%;" class="p-field p-col-12 p-md-2 mt-2">
+                <span class="p-float-label p-input-icon-right">
+                    <p-inputMask mask="99/99/9999" slotChar="__/__/____" [(ngModel)]="esyaYuk.YuklemeTarihi">
+                    </p-inputMask>
+
+                    <label for="YuklemeTarihi"> Yükleme Tarihi <small class="p-error"
+                            *ngIf="!esyaYuk.YuklemeTarihi">*zorunlu</small> </label>
+                    <i class="pi pi-calendar"></i>
+                </span>
+            </div>
+
+            <div style="display: inline-flex; float: right; width: 45%;" class="p-field p-col-12 p-md-2 mt-2">
+                <span class="p-float-label p-input-icon-right">
+                    <p-inputMask mask="99:99" slotChar="--:--" [(ngModel)]="esyaYuk.YuklemeSaati">
+                    </p-inputMask>
+                    <label for="YuklemeSaati"> Yükleme Saati <small class="p-error"
+                            *ngIf="!esyaYuk.YuklemeSaati">*zorunlu</small> </label>
+                    <i class="pi pi-clock"></i>
+                </span>
+            </div>
+        </div>
+
+        <div class="p-fluid p-grid p-formgrid">
+            <div style="display: inline-flex; width: 45%;" class="p-field p-col-12 p-md-2 mt-2">
+                <span class="p-float-label p-input-icon-right">
+                    <p-inputMask mask="99/99/9999" slotChar="__/__/____" [(ngModel)]="esyaYuk.BosaltmaTarihi">
+                    </p-inputMask>
+
+                    <label for="BosaltmaTarihi"> Boşaltma Tarihi <small class="p-error"
+                            *ngIf="!esyaYuk.BosaltmaTarihi">*zorunlu</small> </label>
+                    <i class="pi pi-calendar"></i>
+                </span>
+            </div>
+
+            <div style="display: inline-flex; float: right; width: 45%;" class="p-field p-col-12 p-md-2 mt-2">
+                <span class="p-float-label p-input-icon-right">
+                    <p-inputMask mask="99:99" slotChar="--:--" [(ngModel)]="esyaYuk.BosaltmaSaati">
+                    </p-inputMask>
+                    <label for="BosaltmaSaati"> Boşaltma Saati <small class="p-error"
+                            *ngIf="!esyaYuk.BosaltmaSaati">*zorunlu</small> </label>
+                    <i class="pi pi-clock"></i>
+                </span>
+            </div>
+        </div>
+
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="İptal" icon="pi pi-times" class="p-button-text"
+            (click)="dialogYukCancel()"></button>
+        <button pButton pRipple label="Kaydet" icon="pi pi-check" class="p-button-text"
+            (click)="dialogYukSave(esyaYuk)"></button>
+    </ng-template>
+</p-dialog>
+
+<!-- EsyaYukler -->
+<div class="card">
+    <div class="card-header">
+        <b>EsyaYuk Yönetimi</b>
+        <div style="float: right;">
+            <button type="button" class="btn btn-link btn-sm" [routerLink]="['/esyaSeferler']">seferler</button>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <p-table #dtEsyaYukDetay [value]="esyaYukDetaylar" styleClass="p-datatable-sm" [scrollable]="true"
+            scrollHeight="400px" dataKey="Id" [selectionMode]="selectionMode" [(selection)]="selectedEsyaYukDetay"
+            editMode="row" responsiveLayout="scroll" [paginator]="true" [rows]="rows" [showCurrentPageReport]="true"
+            [(first)]="first" [rowsPerPageOptions]="[5,10,15]" [loading]="loading">
+
+            <ng-template pTemplate="caption">
+                <div style="text-align: left;">
+                    <button pButton pRipple label="Yuk Ekle" icon="pi pi-plus" class="p-button-success p-button-sm"
+                        [disabled]="selectedEsyaYukDetay" (click)="dialogYukAdd()"></button>
+                    <button pButton pRipple label="Aktif/İptal" icon="pi pi-info-circle"
+                        class="p-button-help p-button-sm" style="margin-left: 1%;" [disabled]="!selectedEsyaYukDetay"
+                        (click)="confirmYuk(selectedEsyaYukDetay)"></button>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="min-width:120px">
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="SeferId"> Sefer_Numarası <p-sortIcon field="SeferId">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="YukId"> Yük_Numarası <p-sortIcon field="YukId">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="FirmaYukNo"> Firma_Yük_Numarası <p-sortIcon
+                            field="FirmaYukNo">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="GonderenVergiNo"> Gönderen_Vergi_No <p-sortIcon
+                            field="GonderenVergiNo">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="GonderenUnvan"> Gönderen_Ünvanı <p-sortIcon
+                            field="GonderenUnvan">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="AliciVergiNo"> Alıcı_Vergi_No <p-sortIcon
+                            field="AliciVergiNo">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="AliciUnvan"> Alıcı_Ünvanı <p-sortIcon
+                            field="AliciUnvan">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="TasimaTuru"> Taşıma_Türü <p-sortIcon
+                            field="TasimaTuru">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="TehlikeliMaddeTasimaSekli"> Tehlikeli_Taşıma_Şekli
+                        <p-sortIcon field="TehlikeliMaddeTasimaSekli">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="UnId"> Un_Numarası <p-sortIcon field="UnId">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="YukCinsAdi"> Yük_Cinsi <p-sortIcon field="YukCinsAdi">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="YukMiktariBirimAdi"> Yük_Miktar_Birimi <p-sortIcon
+                            field="YukMiktariBirimAdi">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="YukMiktari"> Yük_Miktarı <p-sortIcon
+                            field="YukMiktari">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="YuklemeIlMernisAdi"> Yükleme_İli <p-sortIcon
+                            field="YuklemeIlMernisAdi">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="YuklemeIlceMernisAdi"> Yükleme_İlçesi <p-sortIcon
+                            field="YuklemeIlceMernisAdi">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="BosaltmaIlMernisAdi"> Boşaltma_İli <p-sortIcon
+                            field="BosaltmaIlMernisAdi">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="BosaltmaIlceMernisAdi"> Boşaltma_İlçesi <p-sortIcon
+                            field="BosaltmaIlceMernisAdi">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="YuklemeTarihi"> Yükleme_Tarihi <p-sortIcon
+                            field="YuklemeTarihi">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="YuklemeSaati"> Yükleme_Saati <p-sortIcon
+                            field="YuklemeSaati">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="BosaltmaTarihi"> Boşaltma_Tarihi <p-sortIcon
+                            field="BosaltmaTarihi">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="BosaltmaSaati"> Boşaltma_Saati <p-sortIcon
+                            field="BosaltmaSaati">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="AktifIptal"> Aktif_İptal <p-sortIcon
+                            field="AktifIptal">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="IptalAciklama"> İptal_Açıklaması <p-sortIcon
+                            field="IptalAciklama">
+                        </p-sortIcon>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-esyaYukDetay let-rowIndex="rowIndex" let-editing="editing">
+                <tr [pSelectableRow]="esyaYukDetay" [pSelectableRowIndex]="rowIndex" [pEditableRow]="esyaYukDetay">
+                    <td style="text-align:left; max-width:120px">
+                        <span style="margin-right: 20px;"> {{rowIndex + 1}}~ </span>
+
+                        <button *ngIf="!editing && selectedEsyaYukDetay == esyaYukDetay" pButton pRipple type="button"
+                            pInitEditableRow icon="pi pi-pencil" class="p-button-rounded p-button-text"
+                            (click)="editYuk(esyaYukDetay)"></button>
+                        <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check"
+                            class="p-button-rounded p-button-text p-button-success p-mr-2"
+                            (click)="editYukSave(selectedEsyaYukDetay)"></button>
+                        <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times"
+                            class="p-button-rounded p-button-text p-button-danger"
+                            (click)="editYukCancel(rowIndex)"></button>
+                    </td>
+                    <td>{{esyaYukDetay.SeferId}}</td>
+                    <td>{{esyaYukDetay.YukId}}</td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText type="text" [(ngModel)]="esyaYukDetay.FirmaYukNo">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaYukDetay.FirmaYukNo}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText type="number" [(ngModel)]="esyaYukDetay.GonderenVergiNo">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaYukDetay.GonderenVergiNo}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText type="text" [(ngModel)]="esyaYukDetay.GonderenUnvan">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaYukDetay.GonderenUnvan}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText type="number" [(ngModel)]="esyaYukDetay.AliciVergiNo">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaYukDetay.AliciVergiNo}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText type="text" [(ngModel)]="esyaYukDetay.AliciUnvan">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaYukDetay.AliciUnvan}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <p-dropdown [options]="tasimaTurleri" optionLabel="Aciklama" [filter]="true"
+                                    filterBy="Aciklama" [placeholder]="esyaYukDetay.TasimaTuru"
+                                    (onChange)="esyaYukTurleri(); esyaYukBirimleri(); esyaTehlikeliTasimaSekilleri(); esyaUnDetay()"
+                                    [(ngModel)]="selectTasimaTur">
+                                </p-dropdown>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaYukDetay.TasimaTuru}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <p-dropdown [autoDisplayFirst]="false" [options]="tehlikeSekilleri"
+                                    optionLabel="Aciklama" [filter]="true" filterBy="Aciklama"
+                                    [disabled]="!tehlikeSekilleri"
+                                    [placeholder]="esyaYukDetay.TehlikeliMaddeTasimaSekli"
+                                    [(ngModel)]="selectTehlikeSekil">
+                                </p-dropdown>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaYukDetay.TehlikeliMaddeTasimaSekli}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <p-dropdown [autoDisplayFirst]="false" [options]="unDetaylar" optionLabel="UnDetail"
+                                    [filter]="true" filterBy="UnDetail" [disabled]="!unDetaylar"
+                                    [placeholder]="esyaYukDetay.UnId" [(ngModel)]="selectUnDetay">
+                                </p-dropdown>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaYukDetay.UnId}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <p-dropdown [options]="yukTurleri" optionLabel="TipAdi" [filter]="true"
+                                    filterBy="TipAdi" [disabled]="!selectTasimaTur"
+                                    [placeholder]="esyaYukDetay.YukCinsAdi" [(ngModel)]="selectYukTur">
+                                </p-dropdown>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaYukDetay.YukCinsAdi}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <p-dropdown [options]="yukBirimleri" optionLabel="Aciklama" [filter]="true"
+                                    filterBy="Aciklama" [disabled]="!selectTasimaTur"
+                                    [placeholder]="esyaYukDetay.YukMiktariBirimAdi" [(ngModel)]="selectYukBirim">
+                                </p-dropdown>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaYukDetay.YukMiktariBirimAdi}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText type="number" [style]="{'width': '7rem'}"
+                                    [(ngModel)]="esyaYukDetay.YukMiktari">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaYukDetay.YukMiktari}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <p-dropdown [options]="yuklemeIller" optionLabel="IlAdi" [filter]="true"
+                                    filterBy="IlAdi" [placeholder]="esyaYukDetay.YuklemeIlMernisAdi"
+                                    (onChange)="esyaYuklemeIlce(selectYuklemeIl.IlKodu)" [(ngModel)]="selectYuklemeIl">
+                                </p-dropdown>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaYukDetay.YuklemeIlMernisAdi}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <p-dropdown [options]="yuklemeIlceler" optionLabel="IlceAdi" [filter]="true"
+                                    filterBy="IlceAdi" [placeholder]="esyaYukDetay.YuklemeIlceMernisAdi"
+                                    [disabled]="!selectYuklemeIl" [(ngModel)]="selectYuklemeIlce">
+                                </p-dropdown>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaYukDetay.YuklemeIlceMernisAdi}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <p-dropdown [options]="bosaltmaIller" optionLabel="IlAdi" [filter]="true"
+                                    filterBy="IlAdi" (onChange)="esyaBosaltmaIlce(selectBosaltmaIl.IlKodu)"
+                                    [placeholder]="esyaYukDetay.BosaltmaIlMernisAdi" [(ngModel)]="selectBosaltmaIl">
+                                </p-dropdown>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaYukDetay.BosaltmaIlMernisAdi}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <p-dropdown [options]="bosaltmaIlceler" optionLabel="IlceAdi" [filter]="true"
+                                    filterBy="IlceAdi" [placeholder]="esyaYukDetay.BosaltmaIlceMernisAdi"
+                                    [disabled]="!selectBosaltmaIl" [(ngModel)]="selectBosaltmaIlce">
+                                </p-dropdown>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaYukDetay.BosaltmaIlceMernisAdi}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <span class="p-float-label p-input-icon-right">
+                                    <p-inputMask mask="99/99/9999" slotChar="__/__/____" [style]="{'width': '9rem'}"
+                                        [(ngModel)]="esyaYukDetay.YuklemeTarihi">
+                                    </p-inputMask>
+                                    <i class="pi pi-calendar"></i>
+                                </span>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaYukDetay.YuklemeTarihi}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <span class="p-float-label p-input-icon-right">
+                                    <p-inputMask mask="99:99" slotChar="--:--" [style]="{'width': '5rem'}"
+                                        [(ngModel)]="esyaYukDetay.YuklemeSaati">
+                                    </p-inputMask>
+                                    <i class="pi pi-clock"></i>
+                                </span>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaYukDetay.YuklemeSaati}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <span class="p-float-label p-input-icon-right">
+                                    <p-inputMask mask="99/99/9999" slotChar="__/__/____" [style]="{'width': '9rem'}"
+                                        [(ngModel)]="esyaYukDetay.BosaltmaTarihi">
+                                    </p-inputMask>
+                                    <i class="pi pi-calendar"></i>
+                                </span>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaYukDetay.BosaltmaTarihi}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <span class="p-float-label p-input-icon-right">
+                                    <p-inputMask mask="99:99" slotChar="--:--" [style]="{'width': '5rem'}"
+                                        [(ngModel)]="esyaYukDetay.BosaltmaSaati">
+                                    </p-inputMask>
+                                    <i class="pi pi-clock"></i>
+                                </span>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaYukDetay.BosaltmaSaati}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        {{esyaYukDetay.AktifIptal}}
+                    </td>
+                    <td>
+                        {{esyaYukDetay.IptalAciklama}}
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="summary">
+                <div class="p-d-flex p-ai-center p-jc-between">
+                    Toplam: {{esyaYukDetaylar ? esyaYukDetaylar.length : 0 }}
+                </div>
+            </ng-template>
+        </p-table>
+    </div>
+    <div style="text-align: right; font-size: small" class="card-footer text-muted">
+        Copyright © 2021 UetdsEsya. All rights reserved.
+    </div>
+</div>

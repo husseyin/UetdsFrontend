@@ -1,0 +1,31 @@
+export class EsyaYuk {
+  Id: number;
+  SeferId: number;
+  YukId: number;
+  FirmaYukNo: string;
+  TasimaTuruKodu: number;
+  GonderenVergiNo: string;
+  GonderenUnvan: string;
+  AliciVergiNo: string;
+  AliciUnvan: string;
+  YuklemeUlkeKodu: string;
+  YuklemeIlMernisKodu: number;
+  YuklemeIlceMernisKodu: number;
+  BosaltmaUlkeKodu: string;
+  BosaltmaIlMernisKodu: number;
+  BosaltmaIlceMernisKodu: number;
+  YuklemeTarihi: string;
+  YuklemeSaati: string;
+  BosaltmaTarihi: string;
+  BosaltmaSaati: string;
+  YukCinsId: number;
+  YukCinsDigerAciklama: string;
+  YukMiktariBirimi: string;
+  YukMiktari: string;
+  TehlikeliMaddeTasimaKodu: number;
+  UnId: string;
+  MuafiyetTuru: string;
+  AktifIptal: string;
+  IptalKodu: string;
+  IptalAciklama: string;
+}

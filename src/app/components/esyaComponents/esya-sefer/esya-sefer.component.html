@@ -1,0 +1,373 @@
+<!-- Toast and ConfirmDialog -->
+<p-toast [baseZIndex]="10000"></p-toast>
+<p-confirmDialog #ap [style]="{width: '40vw'}" [baseZIndex]="5000" [transitionOptions]="'250ms'" position="top">
+    <ng-template pTemplate="header">
+        <h5>Sefer Durumu</h5>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <div class="p-fluid p-grid p-formgrid">
+            <span class="p-float-label" style="text-align: left;" *ngIf="aktifIptalMode">
+                <p-dropdown inputId="IptalTur" [autoDisplayFirst]="false" [options]="iptalTurleri"
+                    optionLabel="aciklamaField" [filter]="true" filterBy="aciklamaField" [(ngModel)]="selectIptalTur">
+                </p-dropdown>
+                <label for="IptalTur"> İptal Tür <small class="p-error" *ngIf="!selectIptalTur">*zorunlu</small></label>
+            </span>
+        </div>
+        <button type="button" pButton icon="pi pi-times" class="p-button-text" label="İptal"
+            (click)="ap.reject()"></button>
+        <button type="button" pButton icon="pi pi-check" class="p-button-text" label="Kaydet"
+            (click)="ap.accept()"></button>
+    </ng-template>
+</p-confirmDialog>
+
+<!-- EsyaSeferDialog -->
+<p-dialog [(visible)]="esyaSeferDialog" [style]="{width: '40%', height:'80%'}" [transitionOptions]="'250ms'"
+    [draggable]="false" [resizable]="false" header="Yeni Sefer Ekleme" [modal]="true" styleClass="p-fluid">
+
+    <ng-template pTemplate="content">
+
+        <div class="p-field p-col-12 p-md-2 mt-3">
+            <span class="p-float-label">
+                <input type="text" id="FirmaSeferNo" pInputText [(ngModel)]="esyaSefer.FirmaSeferNo">
+                <label for="FirmaSeferNo"> Firma Sefer Numarası</label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <p-dropdown inputId="Plaka1" [autoDisplayFirst]="false" [options]="plakalar" optionLabel="Plaka"
+                    [filter]="true" filterBy="Plaka"
+                    (onChange)="esyaYetkiBelgesi(selectPalaka1 ? selectPalaka1.Plaka : null)"
+                    [(ngModel)]="selectPalaka1">
+                </p-dropdown>
+                <label for="Plaka1"> Plaka1 <small class="p-error" *ngIf="!selectPalaka1">*zorunlu</small></label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <p-dropdown inputId="Plaka2" [autoDisplayFirst]="false" [options]="plakalar" optionLabel="Plaka"
+                    [filter]="true" filterBy="Plaka" [showClear]="true"
+                    (onChange)="esyaYetkiBelgesi(selectPalaka2 ? selectPalaka2.Plaka : null)"
+                    [(ngModel)]="selectPalaka2">
+                </p-dropdown>
+                <label for="Plaka2"> Plaka2 </label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <p-inputMask mask="99999999999" slotChar="-----------"
+                    (keyup)="esyaMeslekiYeterlilik(esyaSefer.Sofor1TCNo)" [(ngModel)]="esyaSefer.Sofor1TCNo">
+                </p-inputMask>
+                <label for="Sofor1TCNo"> Şoför1 TcKimlik <small class="p-error"
+                        *ngIf="!esyaSefer.Sofor1TCNo">*zorunlu</small></label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <p-inputMask mask="99999999999" slotChar="-----------"
+                    (keyup)="esyaMeslekiYeterlilik(esyaSefer.Sofor2TCNo)" [(ngModel)]="esyaSefer.Sofor2TCNo">
+                </p-inputMask>
+                <label for="Sofor2TCNo"> Şoför2 TcKimlik </label>
+            </span>
+        </div>
+
+        <div class="p-fluid p-grid p-formgrid">
+            <div style="display: inline-flex; width: 45%;" class="p-field p-col-12 p-md-2 mt-2">
+                <span class="p-float-label p-input-icon-right">
+                    <p-inputMask mask="99/99/9999" slotChar="__/__/____" [(ngModel)]="esyaSefer.BaslangicTarihi">
+                    </p-inputMask>
+
+                    <label for="BaslangicTarihi"> Başlangıç Tarihi <small class="p-error"
+                            *ngIf="!esyaSefer.BaslangicTarihi">*zorunlu</small> </label>
+                    <i class="pi pi-calendar"></i>
+                </span>
+            </div>
+
+            <div style="display: inline-flex; float: right; width: 45%;" class="p-field p-col-12 p-md-2 mt-2">
+                <span class="p-float-label p-input-icon-right">
+                    <p-inputMask mask="99:99" slotChar="--:--" [(ngModel)]="esyaSefer.BaslangicSaati">
+                    </p-inputMask>
+                    <label for="BaslangicSaati"> Başlangıç Saati <small class="p-error"
+                            *ngIf="!esyaSefer.BaslangicSaati">*zorunlu</small> </label>
+                    <i class="pi pi-clock"></i>
+                </span>
+            </div>
+        </div>
+
+        <div class="p-fluid p-grid p-formgrid">
+            <div style="display: inline-flex; width: 45%;" class="p-field p-col-12 p-md-2 mt-2">
+                <span class="p-float-label p-input-icon-right">
+                    <p-inputMask mask="99/99/9999" slotChar="__/__/____" [(ngModel)]="esyaSefer.BitisTarihi">
+                    </p-inputMask>
+
+                    <label for="BitisTarihi"> Bitiş Tarihi <small class="p-error"
+                            *ngIf="!esyaSefer.BitisTarihi">*zorunlu</small> </label>
+                    <i class="pi pi-calendar"></i>
+                </span>
+            </div>
+
+            <div style="display: inline-flex; float: right; width: 45%;" class="p-field p-col-12 p-md-2 mt-2">
+                <span class="p-float-label p-input-icon-right">
+                    <p-inputMask mask="99:99" slotChar="--:--" [(ngModel)]="esyaSefer.BitisSaati">
+                    </p-inputMask>
+                    <label for="BitisSaati"> Bitiş Saati <small class="p-error"
+                            *ngIf="!esyaSefer.BitisSaati">*zorunlu</small> </label>
+                    <i class="pi pi-clock"></i>
+                </span>
+            </div>
+        </div>
+
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="İptal" icon="pi pi-times" class="p-button-text"
+            (click)="dialogSeferCancel()"></button>
+        <button pButton pRipple label="Kaydet" icon="pi pi-check" class="p-button-text"
+            (click)="dialogSeferSave(esyaSefer)"></button>
+    </ng-template>
+</p-dialog>
+
+<!-- EsyaSeferler -->
+<div class="card">
+    <div style="font-weight: bold" class="card-header">EsyaSefer Yönetimi</div>
+
+    <div class="card-body">
+        <p-table #dtEsyaSefer [value]="esyaSeferler" styleClass="p-datatable-sm" [scrollable]="true"
+            scrollHeight="400px" dataKey="Id" [selectionMode]="selectionMode" [(selection)]="selectedEsyaSefer"
+            editMode="row" responsiveLayout="scroll" [paginator]="true" [rows]="rows" [showCurrentPageReport]="true"
+            [(first)]="first" [rowsPerPageOptions]="[5,10,15]" [loading]="loading">
+
+            <ng-template pTemplate="caption">
+                <div style="text-align: left;">
+                    <button pButton pRipple label="Sefer Ekle" icon="pi pi-plus" class="p-button-success p-button-sm"
+                        [disabled]="selectedEsyaSefer" (click)="dialogSeferAdd()"></button>
+                    <button pButton pRipple label="Yük Ekle" icon="pi pi-inbox" class="p-button-secondary p-button-sm"
+                        style="margin-left: 1%;" [disabled]="!selectedEsyaSefer" [routerLink]="['/esyaYukler']"
+                        [queryParams]="{esyaSeferId : selectedEsyaSefer ? selectedEsyaSefer.SeferId : -1}"></button>
+                    <button pButton pRipple label="Aktif/İptal" icon="pi pi-info-circle"
+                        class="p-button-help p-button-sm" style="margin-left: 1%;" [disabled]="!selectedEsyaSefer"
+                        (click)="confirmSefer(selectedEsyaSefer)"></button>
+                    <button style="float: right;" type="button" *ngIf="selectedEsyaSefer" pButton pRipple
+                        label="Sefer Detay" icon="pi pi-file-pdf" class="p-button-warning p-button-sm p-mr-2"
+                        pTooltip="PDF" (click)="esyaSeferPDF(selectedEsyaSefer.SeferId)"
+                        tooltipPosition="bottom"></button>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="min-width:120px">
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="SeferId"> Sefer_Numarası <p-sortIcon field="SeferId">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="FirmaSeferNo"> Firma_Sefer_Numarası<p-sortIcon
+                            field="FirmaSeferNo">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="Plaka1"> Plaka1 <p-sortIcon field="Plaka1">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="Plaka2"> Plaka2 <p-sortIcon field="Plaka2">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="Sofor1TCNo"> Şoför1_TcKimlik <p-sortIcon
+                            field="Sofor1TCNo">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="Sofor2TCNo"> Şoför2_TcKimlik <p-sortIcon
+                            field="Sofor2TCNo">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="BaslangicTarihi"> Başlangıç_Tarihi <p-sortIcon
+                            field="BaslangicTarihi">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="BaslangicSaati"> Başlangıç_Saati <p-sortIcon
+                            field="BaslangicSaati">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="BitisTarihi"> Bitiş_Tarihi <p-sortIcon
+                            field="BitisTarihi">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="BitisSaati"> Bitiş_Saati <p-sortIcon
+                            field="BitisSaati">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="AktifIptal"> Aktif_İptal <p-sortIcon
+                            field="AktifIptalAciklama">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="IptalAciklama"> İptal_Açıklaması <p-sortIcon
+                            field="IptalAciklama">
+                        </p-sortIcon>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-esyaSefer let-rowIndex="rowIndex" let-editing="editing">
+                <tr [pSelectableRow]="esyaSefer" [pSelectableRowIndex]="rowIndex" [pEditableRow]="esyaSefer">
+                    <td style="text-align:left; max-width:120px">
+                        <span style="margin-right: 20px;"> {{rowIndex + 1}}~ </span>
+
+                        <button *ngIf="!editing && selectedEsyaSefer == esyaSefer" pButton pRipple type="button"
+                            pInitEditableRow icon="pi pi-pencil" class="p-button-rounded p-button-text"
+                            (click)="editSefer(selectedEsyaSefer)"></button>
+                        <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check"
+                            class="p-button-rounded p-button-text p-button-success p-mr-2"
+                            (click)="editSeferSave(selectedEsyaSefer)"></button>
+                        <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times"
+                            class="p-button-rounded p-button-text p-button-danger"
+                            (click)="editSeferCancel(rowIndex)"></button>
+                    </td>
+                    <td>{{esyaSefer.SeferId}}</td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input type="text" pInputText [(ngModel)]="esyaSefer.FirmaSeferNo">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaSefer.FirmaSeferNo}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <p-dropdown inputId="Plaka1" [autoDisplayFirst]="false" [options]="plakalar"
+                                    optionLabel="Plaka" [filter]="true" filterBy="Plaka"
+                                    [placeholder]="esyaSefer.Plaka1"
+                                    (onChange)="esyaYetkiBelgesi(selectPalaka1 ? selectPalaka1.Plaka : null)"
+                                    [(ngModel)]="selectPalaka1">
+                                </p-dropdown>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaSefer.Plaka1}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <p-dropdown inputId="Plaka2" [autoDisplayFirst]="false" [options]="plakalar"
+                                    optionLabel="Plaka" [filter]="true" filterBy="Plaka" [showClear]="true"
+                                    [placeholder]="esyaSefer.Plaka2"
+                                    (onChange)="esyaYetkiBelgesi(selectPalaka2 ? selectPalaka2.Plaka : null)"
+                                    [(ngModel)]="selectPalaka2">
+                                </p-dropdown>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaSefer.Plaka2}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <p-inputMask mask="99999999999" slotChar="-----------" [style]="{'width': '7rem'}"
+                                    (keyup)="esyaMeslekiYeterlilik(esyaSefer.Sofor1TCNo)"
+                                    [(ngModel)]="esyaSefer.Sofor1TCNo">
+                                </p-inputMask>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaSefer.Sofor1TCNo}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+
+                                <p-inputMask mask="99999999999" slotChar="-----------" [style]="{'width': '7rem'}"
+                                    (keyup)="esyaMeslekiYeterlilik(esyaSefer.Sofor2TCNo)"
+                                    [(ngModel)]="esyaSefer.Sofor2TCNo">
+                                </p-inputMask>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaSefer.Sofor2TCNo}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <span class="p-float-label p-input-icon-right">
+                                    <p-inputMask mask="99/99/9999" slotChar="__/__/____" [style]="{'width': '9rem'}"
+                                        [(ngModel)]="esyaSefer.BaslangicTarihi">
+                                    </p-inputMask>
+                                    <i class="pi pi-calendar"></i>
+                                </span>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaSefer.BaslangicTarihi}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <span class="p-float-label p-input-icon-right">
+                                    <p-inputMask mask="99:99" slotChar="--:--" [style]="{'width': '5rem'}"
+                                        [(ngModel)]="esyaSefer.BaslangicSaati">
+                                    </p-inputMask>
+                                    <i class="pi pi-clock"></i>
+                                </span>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaSefer.BaslangicSaati}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <span class="p-float-label p-input-icon-right">
+                                    <p-inputMask mask="99/99/9999" slotChar="__/__/____" [style]="{'width': '9rem'}"
+                                        [(ngModel)]="esyaSefer.BitisTarihi">
+                                    </p-inputMask>
+                                    <i class="pi pi-calendar"></i>
+                                </span>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaSefer.BitisTarihi}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <span class="p-float-label p-input-icon-right">
+                                    <p-inputMask mask="99:99" slotChar="--:--" [style]="{'width': '5rem'}"
+                                        [(ngModel)]="esyaSefer.BitisSaati">
+                                    </p-inputMask>
+                                    <i class="pi pi-clock"></i>
+                                </span>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{esyaSefer.BitisSaati}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        {{esyaSefer.AktifIptal}}
+                    </td>
+                    <td>
+                        {{esyaSefer.IptalAciklama}}
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="summary">
+                <div class="p-d-flex p-ai-center p-jc-between">
+                    Toplam: {{esyaSeferler ? esyaSeferler.length : 0 }}
+                </div>
+            </ng-template>
+        </p-table>
+    </div>
+    <div style="text-align: right; font-size: small" class="card-footer text-muted">
+        Copyright © 2021 UetdsEsya. All rights reserved.
+    </div>
+</div>

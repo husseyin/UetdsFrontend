@@ -1,0 +1,262 @@
+<!-- Toast and ConfirmDialog -->
+<p-toast [baseZIndex]="10000"></p-toast>
+<p-confirmDialog #ap [style]="{width: '40vw'}" [baseZIndex]="5000" [transitionOptions]="'250ms'" position="top">
+    <ng-template pTemplate="header">
+        <h5>Yolcu Durumu</h5>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <div class="p-fluid p-grid p-formgrid">
+            <span class="p-float-label">
+                <input type="text" id="apAciklama" pInputText [(ngModel)]="iptalAciklama">
+                <label for="apAciklama"> Açıklama <small class="p-error" *ngIf="!iptalAciklama">*zorunlu</small></label>
+            </span>
+        </div>
+
+        <button type="button" pButton icon="pi pi-times" class="p-button-text" label="İptal"
+            (click)="ap.reject()"></button>
+        <button type="button" pButton icon="pi pi-check" class="p-button-text" [disabled]="!iptalAciklama"
+            label="Kaydet" (click)="ap.accept()"></button>
+    </ng-template>
+</p-confirmDialog>
+
+<!-- AriziYolcuDialog -->
+<p-dialog [(visible)]="ariziYolcuDialog" [style]="{width: '40%', height:'80%'}" [transitionOptions]="'250ms'"
+    [draggable]="false" [resizable]="false" header="Yeni Yolcu Ekleme" [modal]="true" styleClass="p-fluid">
+
+    <ng-template pTemplate="content">
+        <div class="p-field p-col-12 p-md-2 mt-3">
+            <span class="p-float-label">
+                <p-inputMask mask="99999999999" slotChar="-----------" [(ngModel)]="ariziYolcu.TcKimlikPasaportNo">
+                </p-inputMask>
+                <label for="Telefon"> TcKimlik Pasaport No <small class="p-error"
+                        *ngIf="!ariziYolcu.TcKimlikPasaportNo">*zorunlu</small></label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <input type="text" id="Adi" pInputText [(ngModel)]="ariziYolcu.Adi">
+                <label for="Adi"> Adı <small class="p-error" *ngIf="!ariziYolcu.Adi">*zorunlu</small>
+                </label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <input type="text" id="Soyadi" pInputText [(ngModel)]="ariziYolcu.Soyadi">
+                <label for="Soyadi"> Soyadı <small class="p-error" *ngIf="!ariziYolcu.Soyadi">*zorunlu</small>
+                </label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <p-dropdown inputId="Cinsiyet" [autoDisplayFirst]="false" [options]="cinsiyetler" optionLabel="Cinsiyet"
+                    [filter]="true" filterBy="Adi" [showClear]="true" [(ngModel)]="selectCinsiyet">
+                </p-dropdown>
+                <label for="Cinsiyet"> Cinsiyeti </label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <p-inputMask mask="999-999-9999" [(ngModel)]="ariziYolcu.Telefon"></p-inputMask>
+                <label for="Telefon"> Telefonu </label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <input type="text" id="Koltuk" pInputText [(ngModel)]="ariziYolcu.Koltuk">
+                <label for="Koltuk"> Koltuk No </label>
+            </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-2 mt-2">
+            <span class="p-float-label">
+                <p-inputMask mask="a9a9-9999-99" [(ngModel)]="ariziYolcu.HesKodu"></p-inputMask>
+                <label for="HesKodu"> Hes Kodu </label>
+            </span>
+        </div>
+
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="İptal" icon="pi pi-times" class="p-button-text"
+            (click)="dialogYolcuCancel()"></button>
+        <button pButton pRipple label="Kaydet" icon="pi pi-check" class="p-button-text"
+            (click)="dialogYolcuSave(ariziYolcu)"></button>
+    </ng-template>
+</p-dialog>
+
+<div class="card">
+    <div class="card-header">
+        <b>AriziYolcu Yönetimi</b>
+        <div style="float: right;">
+            <button type="button" class="btn btn-link btn-sm" [routerLink]="['/ariziGruplar']"
+                [queryParams]="{ariziSeferNo : ariziSeferNo}">gruplar</button>
+            <button type="button" class="btn btn-link btn-sm" [routerLink]="['/ariziSeferler']">seferler</button>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <p-table #dtAriziGrup [value]="ariziYolcular" dataKey="Id" [selectionMode]="selectionMode"
+            [(selection)]="selectedAriziYolcu" editMode="row" responsiveLayout="scroll" [paginator]="true" [rows]="rows"
+            [showCurrentPageReport]="true" [(first)]="first" [rowsPerPageOptions]="[5,10,15]" [loading]="loading">
+
+            <ng-template pTemplate="caption">
+                <div style="text-align: left;">
+                    <button pButton pRipple label="Yolcu Ekle" icon="pi pi-plus" class="p-button-success p-button-sm"
+                        [disabled]="selectedAriziYolcu" (click)="dialogYolcuAdd()"></button>
+                    <button pButton pRipple label="İptal Et" icon="pi pi-info-circle" class="p-button-help p-button-sm"
+                        style="margin-left: 1%;" [disabled]="!selectedAriziYolcu"
+                        (click)="confirmYolcu(selectedAriziYolcu)"></button>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="min-width:120px">
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="UetdsSeferReferansNo"> Sefer_Numarası <p-sortIcon
+                            field="UetdsSeferReferansNo">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="UetdsGrupRefNo"> Grup_Numarası <p-sortIcon
+                            field="UetdsGrupRefNo">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="UetdsYolcuRefNo"> Yolcu_Numarası <p-sortIcon
+                            field="UetdsYolcuRefNo">
+                        </p-sortIcon>
+                    <th style="min-width:250px" pSortableColumn="TcKimlikPasaportNo"> TcKimlik_Pasaport_No <p-sortIcon
+                            field="TcKimlikPasaportNo">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="Adi"> Adı <p-sortIcon field="Adi">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="Soyadi"> Soyadı <p-sortIcon field="Soyadi">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="Cinsiyet"> Cinsiyet <p-sortIcon field="Cinsiyet">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="Koltuk"> Koltuk_No <p-sortIcon field="Koltuk">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="Telefon"> Telefonu <p-sortIcon field="Telefon">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="HesKodu"> Hes_Kodu <p-sortIcon field="HesKodu">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="AktifIptal"> Aktif_İptal <p-sortIcon
+                            field="AktifIptal">
+                        </p-sortIcon>
+                    </th>
+                    <th style="min-width:250px" pSortableColumn="IptalAciklama"> İptal_Açıklaması <p-sortIcon
+                            field="IptalAciklama">
+                        </p-sortIcon>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-ariziYolcu let-rowIndex="rowIndex">
+                <tr [pSelectableRow]="ariziYolcu">
+                    <td style="text-align:left; max-width:120px">
+                        <span style="margin-right: 20px;"> {{rowIndex + 1}}~ </span>
+                        
+                    <td>{{ariziYolcu.UetdsSeferReferansNo}}</td>
+                    <td>{{ariziYolcu.UetdsGrupRefNo}}</td>
+                    <td>{{ariziYolcu.UetdsYolcuRefNo}}</td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <p-inputMask mask="99999999999" slotChar="-----------"
+                                    [(ngModel)]="ariziYolcu.TcKimlikPasaportNo"></p-inputMask>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{ariziYolcu.TcKimlikPasaportNo}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText type="text" [(ngModel)]="ariziYolcu.Adi">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{ariziYolcu.Adi}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText type="text" [(ngModel)]="ariziYolcu.Soyadi">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{ariziYolcu.Soyadi}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText type="text" [(ngModel)]="ariziYolcu.Cinsiyet">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{ariziYolcu.Cinsiyet}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText type="text" [(ngModel)]="ariziYolcu.Koltuk">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{ariziYolcu.Koltuk}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText type="text" [(ngModel)]="ariziYolcu.Telefon">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{ariziYolcu.Telefon}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <input pInputText type="text" [(ngModel)]="ariziYolcu.HesKodu">
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{ariziYolcu.HesKodu}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td>
+                        {{ariziYolcu.AktifIptal}}
+                    </td>
+                    <td>
+                        {{ariziYolcu.IptalAciklama}}
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="summary">
+                <div class="p-d-flex p-ai-center p-jc-between">
+                    Toplam: {{ariziYolcular ? ariziYolcular.length : 0 }}
+                </div>
+            </ng-template>
+        </p-table>
+    </div>
+    <div style="text-align: right; font-size: small" class="card-footer text-muted">
+        Copyright © 2021 UetdsArizi. All rights reserved.
+    </div>
+</div>
